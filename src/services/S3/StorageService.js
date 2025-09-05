@@ -15,19 +15,24 @@ class StorageService {
   }
  
  async writeFile(file, meta) {
-    const parameter = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: meta.filename,
-      Body: file._data,
-      ContentType: meta.headers['content-type'],
-    });
-       
-    await this._S3.send(parameter)
- 
-    return this.createPreSignedUrl({ 
-      bucket: process.env.AWS_BUCKET_NAME,
-      key: meta.filename,
-    });
+    try {
+      const parameter = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: meta.filename,
+        Body: file._data,
+        ContentType: meta.headers['content-type'],
+      });
+         
+      await this._S3.send(parameter);
+   
+      return this.createPreSignedUrl({ 
+        bucket: process.env.AWS_BUCKET_NAME,
+        key: meta.filename,
+      });
+    } catch (error) {
+      console.error('S3 upload error:', error);
+      throw error;
+    }
   }
  
   createPreSignedUrl({ bucket, key }) {

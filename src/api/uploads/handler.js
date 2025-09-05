@@ -9,19 +9,24 @@ class UploadsHandler {
   }
  
   async postUploadImageHandler(request, h) {
-    const { data } = request.payload;
-    this._validator.validateImageHeaders(data.hapi.headers);
+    try {
+      const { data } = request.payload;
+      this._validator.validateImageHeaders(data.hapi.headers);
  
-    const fileLocation = await this._service.writeFile(data, data.hapi);
+      const fileLocation = await this._service.writeFile(data, data.hapi);
  
-    const response = h.response({
-      status: 'success',
-      data: {
-        fileLocation,
-      },
-    });
-    response.code(201);
-    return response;
+      const response = h.response({
+        status: 'success',
+        data: {
+          fileLocation,
+        },
+      });
+      response.code(201);
+      return response;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
   }
 }
  
